@@ -1,22 +1,26 @@
 package com.bookStore.bookstore.Services;
 
-import com.bookStore.bookstore.Models.Book;
-import com.bookStore.bookstore.Models.CartItem;
-import com.bookStore.bookstore.Models.User;
-import com.bookStore.bookstore.Models.dto.CartItemDto;
+import com.bookStore.bookstore.Models.dto.request.CartItemRequest;
+import com.bookStore.bookstore.Models.dto.response.CartItemResponse;
+import com.bookStore.bookstore.Models.entity.BookEntity;
+import com.bookStore.bookstore.Models.entity.CartItemEntity;
+import com.bookStore.bookstore.Models.entity.UserEntity;
 import com.bookStore.bookstore.Models.mappers.CartItemMapper;
 import com.bookStore.bookstore.repositories.BookRepository;
 import com.bookStore.bookstore.repositories.CartItemRepository;
 import com.bookStore.bookstore.repositories.UserRepository;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@Validated
 @Transactional(readOnly = true)
 public class CartItemService {
 
@@ -36,60 +40,60 @@ public class CartItemService {
 		this.cartItemMapper = cartItemMapper;
 	}
 
-	public List<CartItemDto> findAll() {
-		return cartItemRepository.findAll().stream().map(cartItemMapper::toDto).toList();
+	public List<CartItemResponse> findAll() {
+		return cartItemRepository.findAll().stream().map(cartItemMapper::toResponse).toList();
 	}
 
-	public List<CartItemDto> findByUserId(UUID userId) {
+	public List<CartItemResponse> findByUserId(UUID userId) {
 		if (!userRepository.existsById(userId)) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + userId);
 		}
-		return cartItemRepository.findByUser_Id(userId).stream().map(cartItemMapper::toDto).toList();
+		return cartItemRepository.findByUser_Id(userId).stream().map(cartItemMapper::toResponse).toList();
 	}
 
-	public CartItemDto findById(UUID id) {
-		CartItem item = cartItemRepository.findById(id)
+	public CartItemResponse findById(UUID id) {
+		CartItemEntity item = cartItemRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart item not found with id: " + id));
-		return cartItemMapper.toDto(item);
+		return cartItemMapper.toResponse(item);
 	}
 
 	@Transactional
-	public CartItemDto create(CartItemDto dto) {
-		User user = userRepository.findById(dto.getUserId())
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + dto.getUserId()));
-		Book book = bookRepository.findById(dto.getBookId())
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found with id: " + dto.getBookId()));
-		if (book.getStock() < dto.getQuantity()) {
+	public CartItemResponse create(@Valid CartItemRequest request) {
+		UserEntity user = userRepository.findById(request.userId())
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + request.userId()));
+		BookEntity book = bookRepository.findById(request.bookId())
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found with id: " + request.bookId()));
+		if (book.getStock() < request.quantity()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough stock for book: " + book.getId());
 		}
 
-		return cartItemRepository.findByUser_IdAndBook_Id(dto.getUserId(), dto.getBookId())
+		return cartItemRepository.findByUser_IdAndBook_Id(request.userId(), request.bookId())
 				.map(existing -> {
-					existing.setQuantity(existing.getQuantity() + dto.getQuantity());
-					return cartItemMapper.toDto(existing);
+					existing.setQuantity(existing.getQuantity() + request.quantity());
+					return cartItemMapper.toResponse(existing);
 				})
 				.orElseGet(() -> {
-					CartItem saved = cartItemRepository.save(CartItem.builder()
+					CartItemEntity saved = cartItemRepository.save(CartItemEntity.builder()
 							.user(user)
 							.book(book)
-							.quantity(dto.getQuantity())
+							.quantity(request.quantity())
 							.build());
-					return cartItemMapper.toDto(saved);
+					return cartItemMapper.toResponse(saved);
 				});
 	}
 
 	@Transactional
-	public CartItemDto update(UUID id, CartItemDto dto) {
-		CartItem item = cartItemRepository.findById(id)
+	public CartItemResponse update(UUID id, @Valid CartItemRequest request) {
+		CartItemEntity item = cartItemRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cart item not found with id: " + id));
-		Book book = bookRepository.findById(dto.getBookId())
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found with id: " + dto.getBookId()));
-		if (book.getStock() < dto.getQuantity()) {
+		BookEntity book = bookRepository.findById(request.bookId())
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found with id: " + request.bookId()));
+		if (book.getStock() < request.quantity()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough stock for book: " + book.getId());
 		}
-		item.setQuantity(dto.getQuantity());
+		item.setQuantity(request.quantity());
 		item.setBook(book);
-		return cartItemMapper.toDto(item);
+		return cartItemMapper.toResponse(item);
 	}
 
 	@Transactional

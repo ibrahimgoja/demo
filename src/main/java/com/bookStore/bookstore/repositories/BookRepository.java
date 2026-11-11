@@ -1,12 +1,12 @@
 package com.bookStore.bookstore.repositories;
 
-import com.bookStore.bookstore.Models.Book;
+import com.bookStore.bookstore.Models.entity.BookEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.UUID;
 
-public interface BookRepository extends JpaRepository<Book, UUID>, JpaSpecificationExecutor<Book> {
+public interface BookRepository extends JpaRepository<BookEntity, UUID>, JpaSpecificationExecutor<BookEntity> {
 
 	boolean existsByIsbn(String isbn);
 

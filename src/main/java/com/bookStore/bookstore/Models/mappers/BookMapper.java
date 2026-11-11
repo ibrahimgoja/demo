@@ -1,32 +1,41 @@
 package com.bookStore.bookstore.Models.mappers;
 
-import com.bookStore.bookstore.Models.Book;
-import com.bookStore.bookstore.Models.dto.BookDto;
+import com.bookStore.bookstore.Models.dto.request.BookRequest;
+import com.bookStore.bookstore.Models.dto.response.BookResponse;
+import com.bookStore.bookstore.Models.entity.BookEntity;
 import org.springframework.stereotype.Component;
 
 @Component
 public class BookMapper {
 
-	public Book toEntity(BookDto dto) {
-		return Book.builder()
-				.title(dto.getTitle())
-				.author(dto.getAuthor())
-				.isbn(dto.getIsbn())
-				.price(dto.getPrice())
-				.stock(dto.getStock())
-				.description(dto.getDescription())
+	public BookEntity toEntity(BookRequest request) {
+		return BookEntity.builder()
+				.title(request.title())
+				.author(request.author())
+				.isbn(request.isbn())
+				.price(request.price())
+				.stock(request.stock())
+				.description(request.description())
 				.build();
 	}
 
-	public BookDto toDto(Book book) {
-		return BookDto.builder()
-				.id(book.getId())
-				.title(book.getTitle())
-				.author(book.getAuthor())
-				.isbn(book.getIsbn())
-				.price(book.getPrice())
-				.stock(book.getStock())
-				.description(book.getDescription())
-				.build();
+	public BookResponse toResponse(BookEntity book) {
+		return new BookResponse(
+				book.getId(),
+				book.getTitle(),
+				book.getAuthor(),
+				book.getIsbn(),
+				book.getPrice(),
+				book.getStock(),
+				book.getDescription());
+	}
+
+	public void applyUpdate(BookEntity book, BookRequest request) {
+		book.setTitle(request.title());
+		book.setAuthor(request.author());
+		book.setIsbn(request.isbn());
+		book.setPrice(request.price());
+		book.setStock(request.stock());
+		book.setDescription(request.description());
 	}
 }

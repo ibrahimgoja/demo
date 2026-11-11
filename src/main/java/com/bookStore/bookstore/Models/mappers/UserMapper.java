@@ -1,25 +1,22 @@
 package com.bookStore.bookstore.Models.mappers;
 
-import com.bookStore.bookstore.Models.User;
-import com.bookStore.bookstore.Models.dto.UserDto;
+import com.bookStore.bookstore.Models.dto.request.UserRequest;
+import com.bookStore.bookstore.Models.dto.response.UserResponse;
+import com.bookStore.bookstore.Models.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {
 
-	public User toEntity(UserDto dto) {
-		return User.builder()
-				.email(dto.getEmail())
-				.username(dto.getUsername())
-				.password(dto.getPassword())
+	public UserEntity toEntity(UserRequest request) {
+		return UserEntity.builder()
+				.email(request.email())
+				.username(request.username())
+				.password(request.password())
 				.build();
 	}
 
-	public UserDto toDto(User user) {
-		return UserDto.builder()
-				.id(user.getId())
-				.email(user.getEmail())
-				.username(user.getUsername())
-				.build();
+	public UserResponse toResponse(UserEntity user) {
+		return new UserResponse(user.getId(), user.getEmail(), user.getUsername());
 	}
 }

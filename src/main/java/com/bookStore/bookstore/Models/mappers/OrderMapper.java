@@ -1,18 +1,17 @@
 package com.bookStore.bookstore.Models.mappers;
 
-import com.bookStore.bookstore.Models.Order;
-import com.bookStore.bookstore.Models.dto.OrderDto;
+import com.bookStore.bookstore.Models.dto.response.OrderResponse;
+import com.bookStore.bookstore.Models.entity.OrderEntity;
 import org.springframework.stereotype.Component;
 
 @Component
 public class OrderMapper {
 
-	public OrderDto toDto(Order order) {
-		return OrderDto.builder()
-				.id(order.getId())
-				.userId(order.getUser().getId())
-				.orderedAt(order.getOrderedAt())
-				.totalPrice(order.getTotalPrice())
-				.build();
+	public OrderResponse toResponse(OrderEntity order) {
+		return new OrderResponse(
+				order.getId(),
+				order.getUser().getId(),
+				order.getOrderedAt(),
+				order.getTotalPrice());
 	}
 }

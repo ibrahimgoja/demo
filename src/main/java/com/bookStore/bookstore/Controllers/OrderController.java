@@ -1,6 +1,6 @@
 package com.bookStore.bookstore.Controllers;
 
-import com.bookStore.bookstore.Models.dto.OrderDto;
+import com.bookStore.bookstore.Models.dto.response.OrderResponse;
 import com.bookStore.bookstore.Services.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,23 +25,23 @@ public class OrderController {
 	}
 
 	@GetMapping
-	public List<OrderDto> getAllOrders() {
+	public List<OrderResponse> getAllOrders() {
 		return orderService.findAll();
 	}
 
 	@GetMapping("/user/{userId}")
-	public List<OrderDto> getOrdersByUserId(@PathVariable UUID userId) {
+	public List<OrderResponse> getOrdersByUserId(@PathVariable UUID userId) {
 		return orderService.findByUserId(userId);
 	}
 
 	@GetMapping("/{id}")
-	public OrderDto getOrderById(@PathVariable UUID id) {
+	public OrderResponse getOrderById(@PathVariable UUID id) {
 		return orderService.findById(id);
 	}
 
 	@PostMapping("/checkout/{userId}")
 	@ResponseStatus(HttpStatus.CREATED)
-	public OrderDto checkout(@PathVariable UUID userId) {
+	public OrderResponse checkout(@PathVariable UUID userId) {
 		return orderService.checkout(userId);
 	}
 

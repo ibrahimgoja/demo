@@ -1,4 +1,4 @@
-package com.bookStore.bookstore.Models;
+package com.bookStore.bookstore.Models.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,7 +22,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class UserEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
@@ -39,9 +39,9 @@ public class User {
 
 	@OneToMany(mappedBy = "user")
 	@Builder.Default
-	private List<CartItem> cartItems = new ArrayList<>();
+	private List<CartItemEntity> cartItems = new ArrayList<>();
 
 	@OneToMany(mappedBy = "user")
 	@Builder.Default
-	private List<Order> orders = new ArrayList<>();
+	private List<OrderEntity> orders = new ArrayList<>();
 }

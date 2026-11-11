@@ -1,6 +1,7 @@
 package com.bookStore.bookstore.Controllers;
 
-import com.bookStore.bookstore.Models.dto.UserDto;
+import com.bookStore.bookstore.Models.dto.request.UserRequest;
+import com.bookStore.bookstore.Models.dto.response.UserResponse;
 import com.bookStore.bookstore.Services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -28,24 +29,24 @@ public class UserController {
 	}
 
 	@GetMapping
-	public List<UserDto> getAllUsers() {
+	public List<UserResponse> getAllUsers() {
 		return userService.findAll();
 	}
 
 	@GetMapping("/{id}")
-	public UserDto getUserById(@PathVariable UUID id) {
+	public UserResponse getUserById(@PathVariable UUID id) {
 		return userService.findById(id);
 	}
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public UserDto createUser(@Valid @RequestBody UserDto dto) {
-		return userService.create(dto);
+	public UserResponse createUser(@Valid @RequestBody UserRequest request) {
+		return userService.create(request);
 	}
 
 	@PutMapping("/{id}")
-	public UserDto updateUser(@PathVariable UUID id, @Valid @RequestBody UserDto dto) {
-		return userService.update(id, dto);
+	public UserResponse updateUser(@PathVariable UUID id, @Valid @RequestBody UserRequest request) {
+		return userService.update(id, request);
 	}
 
 	@DeleteMapping("/{id}")

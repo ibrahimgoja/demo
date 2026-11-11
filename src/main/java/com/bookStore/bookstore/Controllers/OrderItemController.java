@@ -1,6 +1,7 @@
 package com.bookStore.bookstore.Controllers;
 
-import com.bookStore.bookstore.Models.dto.OrderItemDto;
+import com.bookStore.bookstore.Models.dto.request.OrderItemRequest;
+import com.bookStore.bookstore.Models.dto.response.OrderItemResponse;
 import com.bookStore.bookstore.Services.OrderItemService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -28,29 +29,29 @@ public class OrderItemController {
 	}
 
 	@GetMapping
-	public List<OrderItemDto> getAllOrderItems() {
+	public List<OrderItemResponse> getAllOrderItems() {
 		return orderItemService.findAll();
 	}
 
 	@GetMapping("/order/{orderId}")
-	public List<OrderItemDto> getOrderItemsByOrderId(@PathVariable UUID orderId) {
+	public List<OrderItemResponse> getOrderItemsByOrderId(@PathVariable UUID orderId) {
 		return orderItemService.findByOrderId(orderId);
 	}
 
 	@GetMapping("/{id}")
-	public OrderItemDto getOrderItemById(@PathVariable UUID id) {
+	public OrderItemResponse getOrderItemById(@PathVariable UUID id) {
 		return orderItemService.findById(id);
 	}
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public OrderItemDto createOrderItem(@Valid @RequestBody OrderItemDto dto) {
-		return orderItemService.create(dto);
+	public OrderItemResponse createOrderItem(@Valid @RequestBody OrderItemRequest request) {
+		return orderItemService.create(request);
 	}
 
 	@PutMapping("/{id}")
-	public OrderItemDto updateOrderItem(@PathVariable UUID id, @Valid @RequestBody OrderItemDto dto) {
-		return orderItemService.update(id, dto);
+	public OrderItemResponse updateOrderItem(@PathVariable UUID id, @Valid @RequestBody OrderItemRequest request) {
+		return orderItemService.update(id, request);
 	}
 
 	@DeleteMapping("/{id}")

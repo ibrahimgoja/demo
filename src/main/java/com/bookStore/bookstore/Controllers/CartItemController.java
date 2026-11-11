@@ -1,6 +1,7 @@
 package com.bookStore.bookstore.Controllers;
 
-import com.bookStore.bookstore.Models.dto.CartItemDto;
+import com.bookStore.bookstore.Models.dto.request.CartItemRequest;
+import com.bookStore.bookstore.Models.dto.response.CartItemResponse;
 import com.bookStore.bookstore.Services.CartItemService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -28,29 +29,29 @@ public class CartItemController {
 	}
 
 	@GetMapping
-	public List<CartItemDto> getAllCartItems() {
+	public List<CartItemResponse> getAllCartItems() {
 		return cartItemService.findAll();
 	}
 
 	@GetMapping("/user/{userId}")
-	public List<CartItemDto> getCartItemsByUserId(@PathVariable UUID userId) {
+	public List<CartItemResponse> getCartItemsByUserId(@PathVariable UUID userId) {
 		return cartItemService.findByUserId(userId);
 	}
 
 	@GetMapping("/{id}")
-	public CartItemDto getCartItemById(@PathVariable UUID id) {
+	public CartItemResponse getCartItemById(@PathVariable UUID id) {
 		return cartItemService.findById(id);
 	}
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public CartItemDto createCartItem(@Valid @RequestBody CartItemDto dto) {
-		return cartItemService.create(dto);
+	public CartItemResponse createCartItem(@Valid @RequestBody CartItemRequest request) {
+		return cartItemService.create(request);
 	}
 
 	@PutMapping("/{id}")
-	public CartItemDto updateCartItem(@PathVariable UUID id, @Valid @RequestBody CartItemDto dto) {
-		return cartItemService.update(id, dto);
+	public CartItemResponse updateCartItem(@PathVariable UUID id, @Valid @RequestBody CartItemRequest request) {
+		return cartItemService.update(id, request);
 	}
 
 	@DeleteMapping("/{id}")

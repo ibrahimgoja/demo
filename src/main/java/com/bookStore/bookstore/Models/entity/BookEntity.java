@@ -1,4 +1,4 @@
-package com.bookStore.bookstore.Models;
+package com.bookStore.bookstore.Models.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +20,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Book {
+public class BookEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)

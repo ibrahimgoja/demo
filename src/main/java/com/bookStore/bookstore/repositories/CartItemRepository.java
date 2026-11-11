@@ -1,15 +1,15 @@
 package com.bookStore.bookstore.repositories;
 
-import com.bookStore.bookstore.Models.CartItem;
+import com.bookStore.bookstore.Models.entity.CartItemEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface CartItemRepository extends JpaRepository<CartItem, UUID> {
+public interface CartItemRepository extends JpaRepository<CartItemEntity, UUID> {
 
-	List<CartItem> findByUser_Id(UUID userId);
+	List<CartItemEntity> findByUser_Id(UUID userId);
 
-	Optional<CartItem> findByUser_IdAndBook_Id(UUID userId, UUID bookId);
+	Optional<CartItemEntity> findByUser_IdAndBook_Id(UUID userId, UUID bookId);
 }

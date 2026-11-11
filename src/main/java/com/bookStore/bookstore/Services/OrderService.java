@@ -1,10 +1,10 @@
 package com.bookStore.bookstore.Services;
 
-import com.bookStore.bookstore.Models.CartItem;
-import com.bookStore.bookstore.Models.Order;
-import com.bookStore.bookstore.Models.OrderItem;
-import com.bookStore.bookstore.Models.User;
-import com.bookStore.bookstore.Models.dto.OrderDto;
+import com.bookStore.bookstore.Models.dto.response.OrderResponse;
+import com.bookStore.bookstore.Models.entity.CartItemEntity;
+import com.bookStore.bookstore.Models.entity.OrderEntity;
+import com.bookStore.bookstore.Models.entity.OrderItemEntity;
+import com.bookStore.bookstore.Models.entity.UserEntity;
 import com.bookStore.bookstore.Models.mappers.OrderMapper;
 import com.bookStore.bookstore.repositories.CartItemRepository;
 import com.bookStore.bookstore.repositories.OrderRepository;
@@ -39,41 +39,41 @@ public class OrderService {
 		this.orderMapper = orderMapper;
 	}
 
-	public List<OrderDto> findAll() {
-		return orderRepository.findAll().stream().map(orderMapper::toDto).toList();
+	public List<OrderResponse> findAll() {
+		return orderRepository.findAll().stream().map(orderMapper::toResponse).toList();
 	}
 
-	public List<OrderDto> findByUserId(UUID userId) {
+	public List<OrderResponse> findByUserId(UUID userId) {
 		if (!userRepository.existsById(userId)) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + userId);
 		}
-		return orderRepository.findByUser_Id(userId).stream().map(orderMapper::toDto).toList();
+		return orderRepository.findByUser_Id(userId).stream().map(orderMapper::toResponse).toList();
 	}
 
-	public OrderDto findById(UUID id) {
-		Order order = orderRepository.findById(id)
+	public OrderResponse findById(UUID id) {
+		OrderEntity order = orderRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found with id: " + id));
-		return orderMapper.toDto(order);
+		return orderMapper.toResponse(order);
 	}
 
 	@Transactional
-	public OrderDto checkout(UUID userId) {
-		User user = userRepository.findById(userId)
+	public OrderResponse checkout(UUID userId) {
+		UserEntity user = userRepository.findById(userId)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + userId));
 
-		List<CartItem> cartItems = cartItemRepository.findByUser_Id(userId);
+		List<CartItemEntity> cartItems = cartItemRepository.findByUser_Id(userId);
 		if (cartItems.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cart is empty");
 		}
 
 		BigDecimal total = BigDecimal.ZERO;
-		Order order = Order.builder()
+		OrderEntity order = OrderEntity.builder()
 				.user(user)
 				.orderedAt(LocalDateTime.now())
 				.totalPrice(BigDecimal.ZERO)
 				.build();
 
-		for (CartItem cartItem : cartItems) {
+		for (CartItemEntity cartItem : cartItems) {
 			if (cartItem.getBook().getStock() < cartItem.getQuantity()) {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
 						"Not enough stock for book: " + cartItem.getBook().getId());
@@ -82,7 +82,7 @@ public class OrderService {
 					.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
 			total = total.add(lineTotal);
 
-			OrderItem orderItem = OrderItem.builder()
+			OrderItemEntity orderItem = OrderItemEntity.builder()
 					.order(order)
 					.book(cartItem.getBook())
 					.quantity(cartItem.getQuantity())
@@ -94,10 +94,10 @@ public class OrderService {
 		}
 
 		order.setTotalPrice(total);
-		Order saved = orderRepository.save(order);
+		OrderEntity saved = orderRepository.save(order);
 		cartItemRepository.deleteAll(cartItems);
 
-		return orderMapper.toDto(saved);
+		return orderMapper.toResponse(saved);
 	}
 
 	@Transactional

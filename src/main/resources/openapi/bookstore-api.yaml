@@ -1,0 +1,237 @@
+# Contract-first OpenAPI 3 description for the Books resource.
+# Edit this file first, then run: mvnw generate-sources
+openapi: 3.0.3
+
+info:
+  title: Bookstore API
+  description: |
+    Books endpoints (contract-first). Other resources (users, cart, orders)
+    remain on hand-written controllers until added here.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Local development
+
+tags:
+  - name: books
+    description: Catalog operations
+
+paths:
+  /api/books:
+    get:
+      tags: [books]
+      operationId: listBooks
+      summary: List books with optional title filter and Spring Data pagination
+      description: |
+        When `q` is omitted or blank, returns all books (paginated).
+        When `q` is set, filters by title (case-insensitive contains).
+      parameters:
+        - $ref: '#/components/parameters/QueryTitle'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - $ref: '#/components/parameters/SortParam'
+      responses:
+        '200':
+          description: Page of books (Spring Data Page JSON shape)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageBookResponse'
+    post:
+      tags: [books]
+      operationId: createBook
+      summary: Create a new book
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookRequest'
+      responses:
+        '201':
+          description: Book created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/books/{id}:
+    parameters:
+      - $ref: '#/components/parameters/BookIdPath'
+    get:
+      tags: [books]
+      operationId: getBookById
+      summary: Get one book by UUID
+      responses:
+        '200':
+          description: Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [books]
+      operationId: updateBook
+      summary: Replace book fields
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [books]
+      operationId: deleteBook
+      summary: Delete a book
+      responses:
+        '204':
+          description: Deleted (no body)
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  parameters:
+    QueryTitle:
+      name: q
+      in: query
+      required: false
+      description: Title search substring
+      schema:
+        type: string
+    PageParam:
+      name: page
+      in: query
+      required: false
+      description: Zero-based page index
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    SizeParam:
+      name: size
+      in: query
+      required: false
+      description: Page size
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+    SortParam:
+      name: sort
+      in: query
+      required: false
+      description: "Spring sort parameter, e.g. title,asc or price,desc"
+      schema:
+        type: string
+        default: title,asc
+    BookIdPath:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    BadRequest:
+      description: Validation error or business rule violation
+    NotFound:
+      description: Resource not found
+
+  schemas:
+    BookRequest:
+      type: object
+      required:
+        - title
+        - author
+        - isbn
+        - price
+        - stock
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+        author:
+          type: string
+          minLength: 1
+          maxLength: 255
+        isbn:
+          type: string
+          minLength: 1
+          maxLength: 20
+        price:
+          type: number
+          format: decimal
+          minimum: 0
+          multipleOf: 0.01
+        stock:
+          type: integer
+          format: int32
+          minimum: 0
+        description:
+          type: string
+          maxLength: 2000
+          nullable: true
+
+    BookResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        title:
+          type: string
+        author:
+          type: string
+        isbn:
+          type: string
+        price:
+          type: number
+        stock:
+          type: integer
+        description:
+          type: string
+
+    PageBookResponse:
+      type: object
+      description: Mirrors Spring Data Page serialization for BookResponse items
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/BookResponse'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        size:
+          type: integer
+        number:
+          type: integer
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+        numberOfElements:
+          type: integer

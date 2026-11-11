@@ -1,18 +1,17 @@
 package com.bookStore.bookstore.Models.mappers;
 
-import com.bookStore.bookstore.Models.CartItem;
-import com.bookStore.bookstore.Models.dto.CartItemDto;
+import com.bookStore.bookstore.Models.dto.response.CartItemResponse;
+import com.bookStore.bookstore.Models.entity.CartItemEntity;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CartItemMapper {
 
-	public CartItemDto toDto(CartItem item) {
-		return CartItemDto.builder()
-				.id(item.getId())
-				.userId(item.getUser().getId())
-				.bookId(item.getBook().getId())
-				.quantity(item.getQuantity())
-				.build();
+	public CartItemResponse toResponse(CartItemEntity item) {
+		return new CartItemResponse(
+				item.getId(),
+				item.getUser().getId(),
+				item.getBook().getId(),
+				item.getQuantity());
 	}
 }

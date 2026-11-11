@@ -1,4 +1,4 @@
-package com.bookStore.bookstore.Models;
+package com.bookStore.bookstore.Models.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,7 +22,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderItem {
+public class OrderItemEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
@@ -30,11 +30,11 @@ public class OrderItem {
 
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "order_id")
-	private Order order;
+	private OrderEntity order;
 
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "book_id")
-	private Book book;
+	private BookEntity book;
 
 	@Column(nullable = false)
 	private Integer quantity;

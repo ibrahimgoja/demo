@@ -1,0 +1,10 @@
+# Skip sample / duplicate Spring Boot apps generated alongside our real BookstoreApplication
+src/main/java/com/bookStore/bookstore/openapi/OpenApiGeneratorApplication.java
+**/OpenApiGeneratorApplication.java
+**/OpenApiGeneratorApplicationTests.java
+**/HomeController.java
+**/SpringDocConfiguration.java
+**/RFC3339DateFormat.java
+**/application.properties
+pom.xml
+README.md
